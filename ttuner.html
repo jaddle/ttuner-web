@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Ttuner Web</title>
+<link rel='stylesheet' href='ttuner.css' type='text/css' media='all' />
+<script src="ttuner.js"></script>
+
+</head>
+
+<body>
+
+
+<section id="playback">
+<label for="startingNote">Starting Note</label> <input type="text" id="startingNote" /><br />
+<label for="startingFreq">Frequency</label> <input type="text" id="startingFreq" />
+
+<p>playback buttons</p>
+</section>
+
+<section id="temperamentEditor">
+<h1>Temperament Editor</h1>
+name/description
+<ul id="rulesList">
+</ul>
+<input type="submit" name="newRule" value="New Rule" id="newRule">
+
+<p>
+<input type="submit" value="save" id="savetemperament" disabled />
+<input type="submit" value="load" id="loadtemperament" />
+<input type="submit" value="import" id="importtemperament" disabled />
+<input type="submit" value="export" id="exporttemperament" disabled />
+</p>
+
+<select size=5 id="availabletemperaments">
+</select>
+<p id="temperamentdescription"></p>
+
+</section>
+
+<section id="visualization">
+<table id="notestable">
+<tr class="tableheader">
+<th>Note</th>
+<th>Frequency</th>
+<th>Cents</th>
+<!--<th>Perfect 5th</th>
+<th>5th beat rate</th>
+<th>Major 3rd</th>
+<th>+3rd beat rate</th>
+<th>Minor 3rd</th>
+<th>-3rd beat rate</th>-->
+</tr>
+</table>
+</section>
+
+<section id="importExport">
+import/export - this can just be buttons that activate popups where you can cut/paste the json blobs.
+</section>
+
+</body>
+
+</html>
+

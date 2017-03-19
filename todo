@@ -1,0 +1,80 @@
+==========next steps=======
+
+make a git project
+
+
+load built-in temperaments
+implement listener for the "load" button, and have it grab the rules from our array of temperaments (just like we grab the description now), then add all those rules, to the rulesList and the html. (recalculate after, of course!)
+
+
+
+
+
+'new temperament' button - just clear all the rules, name and description.
+
+display current temperament's name and description near the rules. (editable)
+
+
+make noises
+https://css-tricks.com/introduction-web-audio-api/
+
+testing rules for validity when editing
+function should check if it can be parsed, first of all (also when importing)
+and should check if it duplicates an existing rule (MAYBE existing rules could be ok, as long as everything adds up.. but that gets more complicated! For now, just look for existing relationships with the same notes). Maybe better if this causes an error when recalculating - recalc every rule, but halt and highlight an error in the rules if two rules gave different frequencies for the same note.
+also, tidy the input when entering it, and importing - make it all uppercase, change to standard accidental characters, etc, remove extraneous spaces
+
+parse the rule, add dropdown suggestions - start with the last fraction used, and then suggest the other common fractions
+
+saving temperaments and settings to localstorage
+https://www.w3schools.com/html/html5_webstorage.asp
+
+importing/exporting to/from text boxes
+(global for switching to another computer, and just a temperament for sending one to someone)
+
+add more data to the table besides frequency and cents (5th above size, major third size, minor third, etc..)
+change rules list into a table, just to make formatting easier, and to have table headings to describe the fields
+
+make it look nice with some more css
+
+add more visualizations - graph via canvas (or make svgs???)
+
+link button - send a link to your current page - same settings, same temperament (but not all your saved temperaments). Just needs current frequency/startingnote and all the temperament rules.
+
+"help/about" page with version info, home page link, author, etc
+
+===========temperament list=============
+
+Maybe at some point, it'd be nice to sort them different ways - name, degree of inequality, category/type? (circulating, near-equal, meantone, mod-meantone, etc)
+
+===========organization================
+variables - one big one for tuning rules, and another for calculated note info (to start, just save the frequencies)
+
+maybe a few other variables that get saved/restored from local storage for configuration - waveform, octave break location. Either a config popup page lists them, or else just boxes where appropriate (next to table for octave break, near playback for waveform...)
+
+
+==========table============
+a button for "switch 0 point of cents deviation", then just click on a note in the table.
+
+interval stuff needs to figure out *which* interval, in the case of enharmonic stuff. Use the one spelled properly, if it's there, otherwise, use the enharmonic if it's there, otherwise, leave blank.
+
+=========temperament editor=========
+
+need to implement cents input somehow.
+
+temperament name
+description
+
+======starting note/frequency========
+give a list of typical frequencies for that note, + last 4-5 most recent
+
+==============playback==============
+playback: note +/-, octave +/-, start/stop, waveform, chord mode (lets you select the notes (and modify each ones octave) - in the table list, or elsewhere? Step up/down chords!!!
+
+
+
+=============save/export/import=======
+save button
+
+save to local storage with current info - current temperament, etc. after each edit/load so that it remembers the current setup.
+
+export current temperaments, or all local temperaments (show the json export info in a popup text box, for copying and pasting into an e-mail.)
