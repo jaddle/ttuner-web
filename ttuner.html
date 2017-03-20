@@ -15,10 +15,16 @@
 
 
 <section id="playback">
-<label for="startingNote">Starting Note</label> <input type="text" id="startingNote" /><br />
-<label for="startingFreq">Frequency</label> <input type="text" id="startingFreq" />
+<label for="startingNote">Starting Note:</label><input type="text" id="startingNote" size=3 /> <label for="startingFreq">Frequency:</label><input type="text" id="startingFreq" size=8 />
 
-<p>playback buttons</p>
+<p>
+<input type="submit" value="play" id="playstopbutton" />
+<input type="submit" value="prev note" id="prevnote" /><input type="submit" value="next note" id="nextnote" />
+<input type="submit" value="octave up" id="octaveup" /><input type="submit" value="octave down" id="octavedown" />
+</p>
+<p>
+current note: <span id="playbacknote"></span> <span id="playbackfrequency"></span>
+</p>
 </section>
 
 <section id="temperamentEditor">

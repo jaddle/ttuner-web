@@ -2,6 +2,14 @@
 
 make noises
 https://css-tricks.com/introduction-web-audio-api/
+next/prev notes work, but need to do something with octaves. The octave buttons, and also change octaves when going beyond the ends of the array.
+
+also, should the table display the frequencies for the current octave, or just starting from the startingFreq? Maybe a 2nd column for "currnet playback pitch" or something, if that's useful?
+display current octave at the top too
+
+
+
+
 
 testing rules for validity when editing
 function should check if it can be parsed, first of all (also when importing)

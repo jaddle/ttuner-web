@@ -4,12 +4,13 @@ window.onload = function () {
 	//defaults first. Later loading things might overwrite these
 	var startingNote="A";
 	var startingFreq=415.3;
-	var playbackNote="A";
+	var currentPlaybackNote="A";
 	var octave="-1"; // switch octaves at C always? see how console version worked (for batch mode)
 	
 	//variables accessible to other functions
 	var ruleList = [];
 	var notes = {};
+	var sortedNotes=[]; //array of notes, in order of frequency - update it whenever notes changes!
 
 	var localStorage = true;
 
@@ -27,6 +28,10 @@ window.onload = function () {
 	
 	
 	//===========functions===============
+	function sortNotes() {
+		sortedNotes = Object.keys(notes).sort(function(a,b){return notes[b]-notes[a]});
+	}
+
 	function refreshTemperamentList() {
 		//update the html to show the available temperaments
 		var temperamentList = document.getElementById("availabletemperaments");
@@ -67,11 +72,17 @@ window.onload = function () {
 				//FIXME validate
 				startingNote=localStorage.startingNote;
 			} 
+
 			if (localStorage.startingFreq) {
 				//FIXME validate
 				startingFreq=Number(localStorage.startingFreq);
 			}
 
+			//TODO current temperament
+			
+			if (localStorage.currentPlaybackNote) {
+				currentPlaybackNote = localStorage.currentPlaybackNote;
+			}
 		}
 
 		//populate html with settings
@@ -136,6 +147,24 @@ window.onload = function () {
 			notes={};
 			ruleList=[];
 			recalculate();
+		}
+
+		//playback buttons
+
+		//current note's position in the sorted notes array
+		var currentNotePosition = sortedNotes.indexOf(currentPlaybackNote);
+
+		document.getElementById("nextnote").onclick=function() {
+			currentNotePosition++;
+			if (currentNotePosition >= sortedNotes.length) { currentNotePosition = 0; }
+			currentPlaybackNote = sortedNotes[currentNotePosition];
+			updatePlaybackNote();
+		}
+		document.getElementById("prevnote").onclick=function() {
+			currentNotePosition--;
+			if (currentNotePosition < 0) { currentNotePosition = sortedNotes.length-1; }
+			currentPlaybackNote = sortedNotes[currentNotePosition];
+			updatePlaybackNote();
 		}
 	}
 
@@ -438,9 +467,20 @@ window.onload = function () {
 
 			}
 		}
+		sortNotes();
 		updateDisplay();
+		updatePlaybackNote();
 	}
 
+	function updatePlaybackNote() {
+		//checks that the current playback note exists in the temperament, and updates the HTML accordingly
+		if (!notes[currentPlaybackNote]) {
+			currentPlaybackNote = startingNote;
+		}
+
+		document.getElementById("playbacknote").innerHTML = currentPlaybackNote;
+		document.getElementById("playbackfrequency").innerHTML = Math.round(notes[currentPlaybackNote]*100)/100+"Hz";
+	}
 
 	function getNoteNumber(noteName) {
 		//returns an integer: 
@@ -499,9 +539,6 @@ window.onload = function () {
 		var frequencyCell;
 		var centsCell;
 		var decimals = 100; //used for rounding - TODO make this configurable
-
-		//we need the list of notes sorted by frequency
-		var sortedNotes = Object.keys(notes).sort(function(a,b){return notes[b]-notes[a]});
 
 		var tableRows = document.getElementById('notestable').getElementsByTagName('tr');
 		//delete all the old rows except for the table header
