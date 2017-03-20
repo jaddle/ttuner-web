@@ -1,15 +1,5 @@
 ==========next steps=======
 
-make a git project
-
-
-load built-in temperaments
-implement listener for the "load" button, and have it grab the rules from our array of temperaments (just like we grab the description now), then add all those rules, to the rulesList and the html. (recalculate after, of course!)
-
-
-
-
-
 'new temperament' button - just clear all the rules, name and description.
 
 display current temperament's name and description near the rules. (editable)

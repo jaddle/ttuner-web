@@ -16,27 +16,14 @@ window.onload = function () {
 	
 	var i;
 
-	//load built-in temperaments
-	//the handler function will then go on to load the rest of the local data, activate the current temperament (if exists) and activate the listeners for other parts of the page
-	var xmlhttp = new XMLHttpRequest();
-	var availableTemperaments;
+	for (i=0; i<availableTemperaments.length; i++) {
+		availableTemperaments[i].builtin=true;
+	}
 	
-	xmlhttp.onreadystatechange = function() {
-		if (this.readyState == 4 && this.status == 200) {
-			availableTemperaments = JSON.parse(this.responseText);
-
-			for (i=0; i<availableTemperaments.length; i++) {
-				availableTemperaments[i].builtin=true;
-			}
-			
-			refreshTemperamentList();
-			loadLocalSettings();
-			loadCurrentTemperament();
-			addListeners();
-		}
-	};
-	xmlhttp.open("GET", "temperaments.json", true);
-	xmlhttp.send();
+	refreshTemperamentList();
+	loadLocalSettings();
+	loadCurrentTemperament();
+	addListeners();
 	
 	
 	//===========functions===============
@@ -97,35 +84,6 @@ window.onload = function () {
 		document.getElementById("newRule").onclick = function () { 
 			//TODO separate this out so that it can be reused when loading a temperament
 			rulesList = document.getElementById("rulesList");
-			var newRule = document.createElement("li");
-			var note1 = document.createElement("input");
-			var note2 = document.createElement("input");
-			var fraction = document.createElement("input");
-			
-			var comma = document.createElement("select");
-			var PComma = document.createElement("option");
-			var SComma = document.createElement("option");
-			PComma.value="P";
-			PComma.innerHTML="Pythagorean";
-			SComma.value="S";
-			SComma.innerHTML="Syntonic";
-
-			note1.placeholder = "B";
-			note2.placeholder = "E♭";
-			fraction.placeholder = "-1/6";
-
-
-			note1.disabled=true;
-			note2.disabled=true;
-			fraction.disabled=true;
-			comma.disabled=true;
-
-			newRule.appendChild(note1);
-			newRule.appendChild(note2);
-			newRule.appendChild(fraction);
-			comma.appendChild(PComma);
-			comma.appendChild(SComma);
-			newRule.appendChild(comma);
 			rulesList.appendChild(newRule);
 
 			editRule(newRule);
@@ -152,25 +110,87 @@ window.onload = function () {
 		}
 
 		//load temperament
+		var temperamentButton = document.getElementById("loadtemperament");
+
+		temperamentButton.onclick = function() {
+			//get the selected temperament
+			var selectedTemperament = temperamentList.options[temperamentList.selectedIndex].value;
+
+			var i;
+			for (i=0; i<availableTemperaments.length; i++) {
+				if (availableTemperaments[i].name == selectedTemperament) {
+					loadTemperament(availableTemperaments[i]);
+					break;
+				}
+			}
+		}
+	}
+
+	function createRuleHTML(newNote1, newNote2, newFraction, newComma) {
+		//returns an li for insertion into the list of rules. 
+		var newRule = document.createElement("li");
+		
+		var note1 = document.createElement("input");
+		var note2 = document.createElement("input");
+		var fraction = document.createElement("input");
+		
+		var comma = document.createElement("select");
+		var PComma = document.createElement("option");
+		var SComma = document.createElement("option");
+		PComma.value="P";
+		PComma.innerHTML="Pythagorean";
+		SComma.value="S";
+		SComma.innerHTML="Syntonic";
+		comma.appendChild(PComma);
+		comma.appendChild(SComma);
+
+		note1.placeholder = "B";
+		note2.placeholder = "E♭";
+		fraction.placeholder = "-1/6";
+
+
+		note1.disabled=true;
+		note2.disabled=true;
+		fraction.disabled=true;
+		comma.disabled=true;
+
+		if (newNote1) note1.value=newNote1;
+		if (newNote2) note2.value=newNote2;
+		if (newFraction) fraction.value=newFraction;
+		if (newComma == "P") { comma.options[0].selected=true; }
+		if (newComma == "S") { comma.options[1].selected=true; }
+
+		newRule.appendChild(note1);
+		newRule.appendChild(note2);
+		newRule.appendChild(fraction);
+		newRule.appendChild(comma);
+		return newRule;
+
 	}
 		
+	function loadTemperament(temperament) {
+		//takes a temperament object (name, description, rules[]) and loads it into the rule list, and updates the html and recalculates
+		var i;
+		
+		//clear existing rules and html
+		ruleList = temperament.rules;
+		rulesList = document.getElementById("rulesList");
+		rulesList.innerHTML = "";
+
+		var newRule;
+
+		//TODO set name and description
+		for (i=0; i<temperament.rules.length; i++) {
+			newRule = createRuleHTML(temperament.rules[i].note1, temperament.rules[i].note2, temperament.rules[i].fraction, temperament.rules[i].comma);
+			rulesList.appendChild(newRule);
+		}
+		recalculate();
+	}
 		
 
 	function loadCurrentTemperament() {
 		//load current temperament (if there is one)
-		//TODO
-		if (!"currenttemperamentloaded") {
-			//load up the rules list for the temperament
-			//TODO
-			
-			//make the rules
-			
-			//loop through ruleList, adding a rule to the html each time.
-			//TODO use the stuff currently in newRule, but separate out to a function
-			
-			//TODO - add an edit button
 
-		}
 		//calculate note values
 		recalculate();
 	}
