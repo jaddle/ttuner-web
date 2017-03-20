@@ -400,6 +400,7 @@ window.onload = function () {
 
 				if (inverted) {
 					ratio = 2/ratio;
+					tuneFraction = tuneFraction * -1;
 				}
 
 				//modify the base ratio based on the relationship
