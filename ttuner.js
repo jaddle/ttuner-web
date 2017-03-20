@@ -154,13 +154,13 @@ window.onload = function () {
 		//current note's position in the sorted notes array
 		var currentNotePosition = sortedNotes.indexOf(currentPlaybackNote);
 
-		document.getElementById("nextnote").onclick=function() {
+		document.getElementById("prevnote").onclick=function() {
 			currentNotePosition++;
 			if (currentNotePosition >= sortedNotes.length) { currentNotePosition = 0; }
 			currentPlaybackNote = sortedNotes[currentNotePosition];
 			updatePlaybackNote();
 		}
-		document.getElementById("prevnote").onclick=function() {
+		document.getElementById("nextnote").onclick=function() {
 			currentNotePosition--;
 			if (currentNotePosition < 0) { currentNotePosition = sortedNotes.length-1; }
 			currentPlaybackNote = sortedNotes[currentNotePosition];
