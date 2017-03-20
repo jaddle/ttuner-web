@@ -183,7 +183,13 @@ window.onload = function () {
 
 		var newRule;
 
-		//TODO set name and description
+		//set name and description
+		var nameInput = document.getElementById("temperamentName");
+		var description = document.getElementById("temperamentDescription");
+
+		nameInput.value = temperament.name;
+		description.innerHTML = temperament.description;
+
 		for (i=0; i<temperament.rules.length; i++) {
 			newRule = createRuleHTML(temperament.rules[i].note1, temperament.rules[i].note2, temperament.rules[i].fraction, temperament.rules[i].comma);
 			rulesList.appendChild(newRule);
