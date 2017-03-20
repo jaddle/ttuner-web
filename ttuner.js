@@ -148,6 +148,10 @@ window.onload = function () {
 		note2.placeholder = "E♭";
 		fraction.placeholder = "-1/6";
 
+		note1.size=3;
+		note2.size=3;
+		fraction.size = 6;
+
 
 		note1.disabled=true;
 		note2.disabled=true;
