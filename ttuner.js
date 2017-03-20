@@ -124,6 +124,19 @@ window.onload = function () {
 				}
 			}
 		}
+
+		//new temperament
+
+		var newTempButton = document.getElementById("newtemperament");
+		newTempButton.onclick = function() {
+			//clear rules list (html and variable), and notes, and remove name/description
+			document.getElementById("rulesList").innerHTML = "";
+			document.getElementById("temperamentName").value="";
+			document.getElementById("temperamentDescription").innerHTML="";
+			notes={};
+			ruleList=[];
+			recalculate();
+		}
 	}
 
 	function createRuleHTML(newNote1, newNote2, newFraction, newComma) {
