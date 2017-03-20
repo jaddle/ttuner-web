@@ -474,7 +474,7 @@ window.onload = function () {
 		var nameCell;
 		var frequencyCell;
 		var centsCell;
-		
+		var decimals = 100; //used for rounding - TODO make this configurable
 
 		//we need the list of notes sorted by frequency
 		var sortedNotes = Object.keys(notes).sort(function(a,b){return notes[b]-notes[a]});
@@ -489,8 +489,8 @@ window.onload = function () {
 			frequencyCell = document.createElement('td');
 			centsCell = document.createElement('td');
 			nameCell.innerHTML = sortedNotes[i];
-			frequencyCell.innerHTML = notes[sortedNotes[i]];
-			centsCell.innerHTML = getCents(sortedNotes[i]);
+			frequencyCell.innerHTML = Math.round(notes[sortedNotes[i]]*100)/100;
+			centsCell.innerHTML = Math.round(getCents(sortedNotes[i])*100)/100;
 
 			row.appendChild(nameCell);
 			row.appendChild(frequencyCell);

@@ -4,7 +4,6 @@
 
 display current temperament's name and description near the rules. (editable)
 
-
 make noises
 https://css-tricks.com/introduction-web-audio-api/
 
@@ -26,9 +25,12 @@ change rules list into a table, just to make formatting easier, and to have tabl
 
 make it look nice with some more css
 
+chord mode
+
 add more visualizations - graph via canvas (or make svgs???)
 
 link button - send a link to your current page - same settings, same temperament (but not all your saved temperaments). Just needs current frequency/startingnote and all the temperament rules.
+(disable when local file:// url)
 
 "help/about" page with version info, home page link, author, etc
 
