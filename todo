@@ -1,16 +1,5 @@
 ==========next steps=======
 
-make noises
-https://css-tricks.com/introduction-web-audio-api/
-next/prev notes work, but need to do something with octaves. The octave buttons, and also change octaves when going beyond the ends of the array.
-
-also, should the table display the frequencies for the current octave, or just starting from the startingFreq? Maybe a 2nd column for "currnet playback pitch" or something, if that's useful?
-display current octave at the top too
-
-
-
-
-
 testing rules for validity when editing
 function should check if it can be parsed, first of all (also when importing)
 and should check if it duplicates an existing rule (MAYBE existing rules could be ok, as long as everything adds up.. but that gets more complicated! For now, just look for existing relationships with the same notes). Maybe better if this causes an error when recalculating - recalc every rule, but halt and highlight an error in the rules if two rules gave different frequencies for the same note.
@@ -64,9 +53,13 @@ description
 give a list of typical frequencies for that note, + last 4-5 most recent
 
 ==============playback==============
-playback: note +/-, octave +/-, start/stop, waveform, chord mode (lets you select the notes (and modify each ones octave) - in the table list, or elsewhere? Step up/down chords!!!
+also, should the table display the frequencies for the current octave, or just starting from the startingFreq? Maybe a 2nd column for "currnet playback pitch" or something, if that's useful?
+also highlight the current note in the table
+keyboard shortcut for next/prev note and octave
 
+option for waveform
 
+chord mode (lets you select the notes (and modify each one's octave) - in the table list, or elsewhere? Step up/down chords would be nice!
 
 =============save/export/import=======
 save button
@@ -74,3 +67,9 @@ save button
 save to local storage with current info - current temperament, etc. after each edit/load so that it remembers the current setup.
 
 export current temperaments, or all local temperaments (show the json export info in a popup text box, for copying and pasting into an e-mail.)
+
+
+
+
+============compatibility==============
+input type="range" only supported as of v10 in IE...

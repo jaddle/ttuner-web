@@ -6,6 +6,9 @@ window.onload = function () {
 	var startingFreq=415.3;
 	var currentPlaybackNote="A";
 	var octave="-1"; // switch octaves at C always? see how console version worked (for batch mode)
+	var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+	var gain = audioContext.createGain();
+	var oscillator;
 	
 	//variables accessible to other functions
 	var ruleList = [];
@@ -166,6 +169,51 @@ window.onload = function () {
 			currentPlaybackNote = sortedNotes[currentNotePosition];
 			updatePlaybackNote();
 		}
+
+		//start/stop
+		document.getElementById("playstopbutton").onclick = function() {
+			//if we're playing, stop, otherwise, start! and toggle the name of the button.
+			if (this.value == "play") {
+				oscillator = audioContext.createOscillator();
+				oscillator.type="sawtooth";
+				oscillator.connect(gain);
+				gain.connect(audioContext.destination);
+				gain.gain.value=document.getElementById("volumeslider").value;
+
+				oscillator.frequency.value=getCurrentFrequency();
+				oscillator.start();
+				this.value = "stop";
+			}
+
+			else {
+				oscillator.stop();	
+				delete oscillator;
+				delete gain;
+				this.value = "play";
+			}
+
+			
+		}
+
+		document.getElementById("octaveup").onclick = function() {
+			octave++;
+			updatePlaybackNote();
+		}
+
+		document.getElementById("octavedown").onclick = function() {
+			octave--;
+			updatePlaybackNote();
+		}
+
+		document.getElementById("volumeslider").oninput = function() {
+			if (oscillator) gain.gain.value = this.value;
+		}
+		
+		
+	}
+
+	function getCurrentFrequency() {
+		return  notes[currentPlaybackNote] * Math.pow(2,octave);
 	}
 
 	function createRuleHTML(newNote1, newNote2, newFraction, newComma) {
@@ -479,7 +527,11 @@ window.onload = function () {
 		}
 
 		document.getElementById("playbacknote").innerHTML = currentPlaybackNote;
-		document.getElementById("playbackfrequency").innerHTML = Math.round(notes[currentPlaybackNote]*100)/100+"Hz";
+		document.getElementById("playbackfrequency").innerHTML = Math.round(getCurrentFrequency()*100)/100+"Hz";
+
+		if (oscillator) {
+			oscillator.frequency.value=getCurrentFrequency();
+		}
 	}
 
 	function getNoteNumber(noteName) {
