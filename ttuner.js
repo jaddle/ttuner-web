@@ -98,6 +98,7 @@ window.onload = function () {
 		document.getElementById("newRule").onclick = function () { 
 			//TODO separate this out so that it can be reused when loading a temperament
 			rulesList = document.getElementById("rulesList");
+			var newRule = createRuleHTML();
 			rulesList.appendChild(newRule);
 
 			editRule(newRule);
@@ -234,9 +235,10 @@ window.onload = function () {
 		comma.appendChild(PComma);
 		comma.appendChild(SComma);
 
-		note1.placeholder = "B";
-		note2.placeholder = "E♭";
-		fraction.placeholder = "-1/6";
+		note1.className = "note1";
+		note2.className = "note2";
+		fraction.className = "fraction";
+		comma.className = "comma";
 
 		note1.size=3;
 		note2.size=3;
@@ -267,11 +269,12 @@ window.onload = function () {
 		var i;
 		
 		//clear existing rules and html
-		ruleList = temperament.rules;
+		ruleList = [];
 		rulesList = document.getElementById("rulesList");
 		rulesList.innerHTML = "";
 
 		var newRule;
+		var rules = rulesList.getElementsByTagName("li");
 
 		//set name and description
 		var nameInput = document.getElementById("temperamentName");
@@ -280,10 +283,21 @@ window.onload = function () {
 		nameInput.value = temperament.name;
 		description.innerHTML = temperament.description;
 
+		newRuleButton = document.getElementById("newRule");
+		console.log(temperament.rules.length);
+
 		for (i=0; i<temperament.rules.length; i++) {
-			newRule = createRuleHTML(temperament.rules[i].note1, temperament.rules[i].note2, temperament.rules[i].fraction, temperament.rules[i].comma);
-			rulesList.appendChild(newRule);
+			newRuleButton.click();
+			newRule = rules[rules.length-1];
+			newRule.getElementsByClassName("note1")[0].value=temperament.rules[i].note1;
+			newRule.getElementsByClassName("note2")[0].value=temperament.rules[i].note2;
+			newRule.getElementsByClassName("fraction")[0].value=temperament.rules[i].fraction;
+			newRule.getElementsByClassName("comma")[0].value=temperament.rules[i].comma;
+			
+			
+			newRule.getElementsByClassName("okButton")[0].click();
 		}
+
 		recalculate();
 	}
 		
@@ -302,18 +316,12 @@ window.onload = function () {
 		editButton = ruleLi.getElementsByClassName("editRuleButton");
 		if (editButton.length> 0) { editButton[0].remove(); }
 		
-		//disable edit,delete buttons on other rules, and 'new rule' button
-		disableButtons();
-		
-
 		//add cancel/delete buttons to this rule (delete, only if it has an ID)
 
 		//make a delete button
 		//IF there's an id set, make a cancel button
 		//if no id is set, rename delete to cancel.
 
-		document.getElementById("newRule").disabled=true;
-		
 		var deletebutton = document.createElement("input");
 		deletebutton.type="submit";
 		deletebutton.value="Delete";
@@ -322,7 +330,6 @@ window.onload = function () {
 				delete ruleList[currentID];
 			}
 			this.parentElement.remove();
-			enableButtons();
 			recalculate();
 		}
 		ruleLi.appendChild(deletebutton);
@@ -333,7 +340,6 @@ window.onload = function () {
 			cancelbutton.value="Cancel";
 			cancelbutton.onclick = function() {
 				//FIXME restore info from list
-				enableButtons();
 			}
 			ruleLi.appendChild(cancelbutton);
 		}
@@ -349,61 +355,111 @@ window.onload = function () {
 		var okButton = document.createElement("input");
 		okButton.type="Submit";
 		okButton.value="Ok";
+		okButton.className="okButton";
 		okButton.onclick = function() {
 			//here we check the rule for validity
 			//first, extract the data from the form
-			var ruleParts=[];
-			var inputs = ruleLi.getElementsByTagName("input");
-			for (i=0; i<inputs.length; i++) {
-				if (inputs[i].type == "text") ruleParts.push(inputs[i].value);
 
-			}
-			var select = ruleLi.getElementsByTagName("select");
-			if (select[0]) { 
-				ruleParts.push(select[0].value)
-			};
+			var rule={};
+			var note1 = ruleLi.getElementsByClassName("note1")[0];
+			var note2 = ruleLi.getElementsByClassName("note2")[0];
+			var fraction = ruleLi.getElementsByClassName("fraction")[0];
+			var comma =  ruleLi.getElementsByTagName("select")[0];
+
+			var errormessage="";
+
+			rule['note1'] = note1.value;
+			rule['note2'] = note2.value;
+			rule['fraction'] = fraction.value;
+			rule['comma'] = comma.value;
+
+
+			rule['ID'] = currentID;
+			
+			rule = checkRule(rule);
 				
+			//insert the sanitized values into the html
+			note1.value = rule['note1'];
+			note2.value = rule['note2'];
+			fraction.value = rule['fraction'];
+			comma.value = rule['comma'];
 
-			var result = checkRule(ruleParts[0], ruleParts[1], ruleParts[2], ruleParts[3]);
-			if (result == 0) {
-				//if it's good, add it to the rule list, deactivate the input boxes, and restore all the edit buttons.
+			//clear any error classes and messages that may have been set
+			note1.className = "note1";
+			note2.className = "note2";
+			fraction.className = "fraction";
+
+			var errorMessageContainer = ruleLi.getElementsByClassName("errormessage")[0];
+			if (errorMessageContainer) {
+				ruleLi.removeChild(ruleLi.getElementsByClassName("errormessage")[0]);
+			}
+				
+			if (rule.valid.errors == 0) {
+				//it's good!
+				//deactivate the input boxes
+				//restore all the edit buttons.
+
 				disableInputs(ruleLi);
-				enableButtons();
 
 				//add to rule list and recalculate notes
-				var newId=addRule(ruleParts[0], ruleParts[1], ruleParts[2], ruleParts[3], currentID);
+				var newId=addRule(rule);
 				if (newId != currentID) {
 					ruleLi.setAttribute("data-ruleid", newId);
 				}			
+
+				//and reset all the buttons back to normal - remove the cancel and delete, and turn this Ok back into an Edit.
+				var buttonsToDelete=Array.prototype.slice.call(ruleLi.getElementsByTagName("input"));
+				for (i=0; i<buttonsToDelete.length; i++) {
+					if (buttonsToDelete[i].type=="submit") { 
+						ruleLi.removeChild(buttonsToDelete[i]); 
+					}
+				}
+
+				var editButton = document.createElement("input");
+				editButton.type="Submit";
+				editButton.value="Edit";
+				editButton.className="editRuleButton";
+				editButton.onclick = function() {
+					editRule(this.parentNode);
+				}
+				ruleLi.appendChild(editButton);
 
 				recalculate();
 
 			}
 			//TODO if it's not good, highlight it in red, with an error message
-			else if (result == -1) { alert("Parse error"); }
-			else { alert("duplicate rule: " + result); }
+			else if (rule['valid']) { 
+				console.log (rule['valid']);
+				//the array in 'valid' will tell us which field had the error.
+				//also check for duplicates TODO in ['valid']['duplicate']
+				if (rule['valid']['note1']) {
+					errormessage += "Note1: ";
+					errormessage += rule['valid']['note1'].join(", ")+" ";
+					//set the error class on the note1input
+					note1.className += " error";
+				}
+				if (rule['valid']['note2']) {
+					errormessage += "Note2: ";
+					errormessage += rule['valid']['note2'].join(", ")+" ";
+					//set the error class on the note2input
+					note2.className += " error";
+				}
+				if (rule['valid']['fraction']) {
+					errormessage += "Fraction: ";
+					errormessage += rule['valid']['fraction'].join(", ")+" ";
+					//set the error class on the note2input
+					fraction.className += " error";
+				}
+
+				errorMessageContainer = document.createElement("span");
+				errorMessageContainer.className="errormessage";
+				//FIXME what's with the space? Just positioning, I think... better to do that in CSS..?
+				errorMessageContainer.innerHTML = " " +errormessage;
+				ruleLi.appendChild(errorMessageContainer);
+
+			}
 
 		
-			//and reset all the buttons back to normal - reactivate newRule, reactivate all the edits, remove the cancel and delete, and turn this Ok back into an Edit.
-			enableButtons();
-			var buttonsToDelete=Array.prototype.slice.call(ruleLi.getElementsByTagName("input"));
-			for (i=0; i<buttonsToDelete.length; i++) {
-				if (buttonsToDelete[i].type=="submit") { 
-					ruleLi.removeChild(buttonsToDelete[i]); 
-				}
-			}
-
-			var editButton = document.createElement("input");
-			editButton.type="Submit";
-			editButton.value="Edit";
-			editButton.className="editRuleButton";
-			editButton.onclick = function() {
-				editRule(this.parentNode);
-			}
-			ruleLi.appendChild(editButton);
-
-
-
 		}
 		ruleLi.appendChild(okButton);
 			
@@ -634,25 +690,23 @@ window.onload = function () {
 	}
 
 
-	function addRule(note1, note2, fraction, comma, id) {
+	function addRule(rule) {
 		//adds the data to the rules list and returns the id of the rule
 
-		if (id) {
+		if (rule['id']) {
 			//replace the existing rule
-			ruleList[id]={note1: note1, note2: note2, fraction:fraction, comma:comma};
-			return id;
+			ruleList[rule['id']]=rule;
+			//don't want extra id values floating around in there where they shouldn't be!
+			delete ruleList[rule['id']]['id'];
+			return rule['id'];
 		}
 		else {
 			//if id is 0, it's a new id
 			//push the data into the list
-			ruleList.push({note1: note1, note2: note2, fraction:fraction, comma:comma});
+			ruleList.push(rule);
 			return ruleList.length-1;
 		}
 
-	}
-
-	function disableInputs(element) {
-		//disable all the input boxes inside an element
 	}
 
 	function enableInputs(element) {
@@ -666,6 +720,7 @@ window.onload = function () {
 	}
 
 	function disableInputs(element) {
+		//disable all the input boxes inside an element
 		var inputs = element.getElementsByTagName("input");
 		var i;
 		for (i=0; i<inputs.length; i++) {
@@ -675,40 +730,115 @@ window.onload = function () {
 		if (select[0]) select[0].disabled=true;
 	}
 
-	function disableButtons() {
-		//when editing a rule, disable the edit buttons and new rule button
-		document.getElementById('newRule').disabled=true;
-		var i;
-		editButtons=document.getElementsByClassName('editRuleButton');
-		for (i = 0; i < editButtons.length; i++) {
-			editButtons[i].disabled=true;
-		}
-	}
+	function checkRule(rule) {
+		//check the three rule parts. Return a sanitized version of the rule with an extra field 'valid':
+		//valid contains info about the things that didn't work. If it doesn't have anything, all is well!
 
-	function enableButtons() {
-		//re-enable edit buttons and new rule button when finished editing rule
-		document.getElementById('newRule').disabled=false;
 		var i;
-		editButtons=document.getElementsByClassName('editRuleButton');
-		for (i = 0; i < editButtons.length; i++) {
-			editButtons[i].disabled=false;
-		}
-	}
+		var note;
+		var accidental;
+		rule['valid'] = {'errors': 0};
+		//clear whitespace for all values
+		rule['note1'] = rule['note1'].replace(/\s/g, '');
+		rule['note2'] = rule['note2'].replace(/\s/g, '');
+		rule['fraction'] = rule['fraction'].replace(/\s/g, '');
+		rule['comma'] = rule['comma'].replace(/\s/g, '');
 
-	function checkRule(note1, note2, fraction, comma) {
-		//check the three rule parts. Return 0 if everything is good. An integer if it's duplicating an existing one, or -1 if it can't parse it.
+		var errors;
+
+		//check notenames and accidentals, making uppercase
+		for (i=1; i<3; i++) {
+			errors = [];
+			notename = rule['note'+i][0];
+			if (!notename) notename="";
+			if (rule['note'+i].length > 1) { accidental = rule['note'+i].slice(1); }
+			else { accidental = ''; }
+
+			notename = notename.toUpperCase();
+
+			if (notename.search(/[A-G]/) == -1) {
+				errors.push("Invalid note name");
+			}
+
+			switch (accidental) {
+				case '':
+					break;
+
+				case '#':
+				case '♯':
+				case '+':
+					accidental = '♯';
+					break;
+
+				case 'b':
+				case '-':
+				case '♭':
+					accidental = '♭';
+					break;
+
+				case '##':
+				case '++':
+				case '♯♯':
+				case 'x':
+				case '×':
+					accidental = 'x';
+					break;
+
+				case 'bb':
+				case '♭♭':
+				case '--':
+					accidental = '♭♭';
+					break;
+
+				default:
+					errors.push("Invalid accidental");
+					break;
+			}
+
+			if (errors.length >0) { rule['valid']['note'+i] = errors; rule['valid']['errors']++; }
+			else rule['note'+i] = notename+accidental;
+
+		}
+
+		//check the fraction next;
+		var sign;
+		var fraction = rule['fraction'];
+		var numbers = [];
+		var slashpos;
+		errors = [];
+		//should be blank, [+/-]number, number being either a straight number or else two numbers with a / 2nd number can't be negative.
+		if (rule['fraction'].length > 0) {
+			if (fraction[0] == '+' || fraction[0] == '-') {
+				sign = fraction[0];
+				fraction = fraction.slice(1);
+			}
+
+
+			slashpos = fraction.search('/');
+			if (slashpos) {
+				//this is a fraction!
+				numbers = fraction.split('/');
+			}
+			else { numbers[0] = fraction; }
+
+			for (i=0; i<numbers.length; i++) {
+				//test the number(s) for validity.
+				if (isNaN(numbers[i])) {
+					rule.valid.errors++;
+					errors.push("invalid fraction");
+				}
+			}
+			if (errors.length>0) { rule['valid']['fraction'] = errors; };
+			
+		}
+
+
+		//check that it's a valid interval (5th/4th or major3rd/minor6th are the only ones supported (for now?)
 		//TODO
-		return(0);
+
+		
+
+		return rule;
 	}
-
-
-	//play note
-
 
 }
-
-
-
-
-
-

@@ -1,31 +1,50 @@
 ==========next steps=======
 
-testing rules for validity when editing
-function should check if it can be parsed, first of all (also when importing)
-and should check if it duplicates an existing rule (MAYBE existing rules could be ok, as long as everything adds up.. but that gets more complicated! For now, just look for existing relationships with the same notes). Maybe better if this causes an error when recalculating - recalc every rule, but halt and highlight an error in the rules if two rules gave different frequencies for the same note.
-also, tidy the input when entering it, and importing - make it all uppercase, change to standard accidental characters, etc, remove extraneous spaces
+check for valid intervals in the rules - only 4th, 5th, and major thirds allowed for now.
 
-parse the rule, add dropdown suggestions - start with the last fraction used, and then suggest the other common fractions
 
-saving temperaments and settings to localstorage
+**make drop-down suggestions
+notes: 
+list of notes. For note1, make the first choice the previous note2
+Once you've typed a notename, suggest its accidentals
+
+fraction:
+suggest first the last used fraction
+then a list of -1/4, -1/5, -1/6, -1/12
+no need to put in anything special for thirds, since they are almost never tuned except pure.
+
+
+
+
+**saving temperaments and settings to localstorage
 https://www.w3schools.com/html/html5_webstorage.asp
 
-importing/exporting to/from text boxes
+**importing/exporting to/from text boxes
 (global for switching to another computer, and just a temperament for sending one to someone)
 
-add more data to the table besides frequency and cents (5th above size, major third size, minor third, etc..)
-change rules list into a table, just to make formatting easier, and to have table headings to describe the fields
-
-make it look nice with some more css
-
-chord mode
-
-add more visualizations - graph via canvas (or make svgs???)
-
-link button - send a link to your current page - same settings, same temperament (but not all your saved temperaments). Just needs current frequency/startingnote and all the temperament rules.
+**link button - send a link to your current page - same settings, same temperament (but not all your saved temperaments). Just needs current frequency/startingnote and all the temperament rules.
 (disable when local file:// url)
 
-"help/about" page with version info, home page link, author, etc
+**"help/about" page with version info, home page link, author, etc
+
+**make it look nice with some more css
+
+**popup "keyboard" to make entry easier, especially on phones. for notes, a row of 7 buttons for notename and 4 for accidental. Even radio buttons could work there, actually.
+for fractions, something similar, maybe?
+
+INITIAL RELEASE (?)
+
+
+
+**add more data to the table besides frequency and cents (5th above size, major third size, minor third, etc..)
+change rules list into a table, just to make formatting easier, and to have table headings to describe the fields
+
+**chord mode
+
+**beat visualization
+
+**add more visualizations - graph via canvas (or make svgs???)
+
 
 ===========temperament list=============
 
@@ -69,7 +88,8 @@ save to local storage with current info - current temperament, etc. after each e
 export current temperaments, or all local temperaments (show the json export info in a popup text box, for copying and pasting into an e-mail.)
 
 
-
+===========checkRule=================
+needs to check for duplicates and valid intervals (p5/M3 and inversions for now)
 
 ============compatibility==============
 input type="range" only supported as of v10 in IE...
