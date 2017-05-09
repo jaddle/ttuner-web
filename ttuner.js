@@ -284,7 +284,6 @@ window.onload = function () {
 		description.innerHTML = temperament.description;
 
 		newRuleButton = document.getElementById("newRule");
-		console.log(temperament.rules.length);
 
 		for (i=0; i<temperament.rules.length; i++) {
 			newRuleButton.click();
@@ -429,7 +428,6 @@ window.onload = function () {
 			}
 			//TODO if it's not good, highlight it in red, with an error message
 			else if (rule['valid']) { 
-				console.log (rule['valid']);
 				//the array in 'valid' will tell us which field had the error.
 				//also check for duplicates TODO in ['valid']['duplicate']
 				if (rule['valid']['note1']) {
@@ -442,6 +440,12 @@ window.onload = function () {
 					errormessage += "Note2: ";
 					errormessage += rule['valid']['note2'].join(", ")+" ";
 					//set the error class on the note2input
+					note2.className += " error";
+				}
+				if (rule['valid']['interval']) {
+					errormessage += "Invalid interval: ";
+					errormessage += rule['valid']['interval'];
+					note1.className += " error";
 					note2.className += " error";
 				}
 				if (rule['valid']['fraction']) {
@@ -520,37 +524,33 @@ window.onload = function () {
 				if (ruleList[i].comma == 'P') { tuneComma = PComma; }
 				if (ruleList[i].comma == 'S') { tuneComma = SComma; }
 
-				//figure out the interval between the two notes and set the base ratio
-				semitones = getNoteNumber(tuneTo) - getNoteNumber(tuneFrom);
-				if (semitones < 0) semitones += 12;
-				inverted = false;
 
+
+				//figure out the interval between the two notes and set the base ratio
+				var interval = getInterval(tuneTo, tuneFrom);
+
+				inverted = false;
 				
-				
-				switch (semitones) {
+				switch (interval.interval) {
 					//perfect 5th/4th
-					case 5:
-					inverted=true;
-					case 7:
+					case "p5":
 					ratio = 3/2;
 					break;
 
 					//major 3rd / minor 6th
-					case 8:
-					inverted = true;
-					case 4:
+					case "M3":
 					ratio = 5/4;
 					break;
 
+					/*
 					//minor 3rd - only do the 7/6 one, not the wonky 8/7 one.
-					case 9:
-					inverted = true;
-					case 3:
+					case "m3":
 					ratio = 7/6;
 					break;
+					*/
 				}
 
-				if (inverted) {
+				if (interval.inverted) {
 					ratio = 2/ratio;
 					tuneFraction = tuneFraction * -1;
 				}
@@ -575,6 +575,42 @@ window.onload = function () {
 		updateDisplay();
 		updatePlaybackNote();
 	}
+	function getInterval(tuneTo, tuneFrom) {
+		var semitones = getNoteNumber(tuneTo) - getNoteNumber(tuneFrom);
+		if (semitones < 0) semitones += 12;
+		var inverted = false;
+		var interval;
+		
+		switch (semitones) {
+			//perfect 5th/4th
+			case 5:
+			inverted=true;
+			case 7:
+			interval = "p5";
+			break;
+
+			//major 3rd / minor 6th
+			case 8:
+			inverted = true;
+			case 4:
+			interval="M3";
+			break;
+
+/*			//minor 3rd - only do the 7/6 one, not the wonky 8/7 one.
+			case 9:
+			inverted = true;
+			case 3:
+			interval = "m3";
+			break;
+*/
+			default:
+			interval = "invalid";
+		}
+
+		return {"interval": interval, "inverted": inverted};
+		
+	}
+
 
 	function updatePlaybackNote() {
 		//checks that the current playback note exists in the temperament, and updates the HTML accordingly
@@ -799,6 +835,16 @@ window.onload = function () {
 			else rule['note'+i] = notename+accidental;
 
 		}
+		
+		//check that it's a valid interval (5th/4th or major3rd/minor6th are the only ones supported (for now?)
+		if (rule['valid']['errors'] == 0) { //don't bother checking if the note names have problems
+			var interval = getInterval(rule['note1'], rule['note2']);
+			if (interval.interval == "invalid") {
+				rule['valid']['interval'] = "only perfect fifths and major thirds are allowed."
+				rule['valid']['errors']++;
+			}
+		}
+
 
 		//check the fraction next;
 		var sign;
@@ -832,11 +878,6 @@ window.onload = function () {
 			
 		}
 
-
-		//check that it's a valid interval (5th/4th or major3rd/minor6th are the only ones supported (for now?)
-		//TODO
-
-		
 
 		return rule;
 	}
