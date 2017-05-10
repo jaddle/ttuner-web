@@ -74,6 +74,7 @@ window.onload = function () {
 			if (localStorage.startingNote) {
 				//FIXME validate
 				startingNote=localStorage.startingNote;
+
 			} 
 
 			if (localStorage.startingFreq) {
@@ -210,7 +211,20 @@ window.onload = function () {
 			if (oscillator) gain.gain.value = this.value;
 		}
 		
-		
+		document.getElementById("startingNote").onchange = function() {
+			//FIXME validate that it's a real note name! Reuse code from checkrule.
+			//if it's not good, print an error message and leave without changing anything.
+			//clear old error message here
+			startingNote = this.value;
+			recalculate();
+		}
+		document.getElementById("startingFreq").onchange = function() {
+			//FIXME validate that it's a valid frequency. Must be a number, between a certain range...? 20-20000?
+			//if it's not good, print an error message and leave without changing anything.
+			//clear old error message here
+			startingFreq = this.value;
+			recalculate();
+		}
 	}
 
 	function getCurrentFrequency() {
@@ -474,6 +488,7 @@ window.onload = function () {
 		//TODO this should be smart enough to only recalculate what's necessary. right now it redoes everything every time.
 
 		//start with the startingNote (i.e. tuning fork!)
+		notes = {};
 		notes[startingNote] = startingFreq;
 
 		//next, step through the rules list until we stop finding new frequencies
@@ -498,6 +513,7 @@ window.onload = function () {
 			noteFound=false;
 			for (i=0; i<ruleList.length; i++) {
 				if (ruleList[i] == undefined) { continue; }
+				console.log(ruleList[i]);
 				
 				//if we have one of the two notes in the relationship, calculate the other!
 
@@ -568,6 +584,7 @@ window.onload = function () {
 
 				//save it in the array
 				notes[tuneTo] = newFrequency;
+				noteFound = true;
 
 			}
 		}
