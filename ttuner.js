@@ -15,10 +15,12 @@ window.onload = function () {
 	var notes = {};
 	var sortedNotes=[]; //array of notes, in order of frequency - update it whenever notes changes!
 
-	var localStorage = true;
+	var localStorageAvailable = true;
 
 	
+	var storagePrefix = "ttuner_";
 	var i;
+
 
 	for (i=0; i<availableTemperaments.length; i++) {
 		availableTemperaments[i].builtin=true;
@@ -56,12 +58,10 @@ window.onload = function () {
 
 	function loadLocalSettings() {
 
-		//FIXME don't bail - everything but saving still works
-		//this surely won't work?
 		if (typeof(Storage) === "undefined") {
 			// Sorry! No Web Storage support..
 			alert("No Web Storage support: no saving or loading will work");
-			localStorage = false;
+			localStorageAvailable = false;
 		}
 
 		else {
@@ -71,21 +71,22 @@ window.onload = function () {
 			//load local settings, setting defaults for anything missing.
 
 
-			if (localStorage.startingNote) {
+			if (localStorage.getItem(storagePrefix+"startingNote")) {
 				//FIXME validate
-				startingNote=localStorage.startingNote;
-
+				startingNote=localStorage.getItem(storagePrefix+"startingNote");
 			} 
-
-			if (localStorage.startingFreq) {
+			
+			if (localStorage.getItem(storagePrefix+"startingFreq")) {
 				//FIXME validate
-				startingFreq=Number(localStorage.startingFreq);
+				startingFreq=localStorage.getItem(storagePrefix+"startingFreq");
 			}
 
 			//TODO current temperament
+			//(name, description, rules)
 			
-			if (localStorage.currentPlaybackNote) {
-				currentPlaybackNote = localStorage.currentPlaybackNote;
+			if (localStorage.getItem(storagePrefix+"startingPlaybackNote")) {
+				//FIXME validate
+				startingPlaybackNote=localStorage.getItem(storagePrefix+"startingPlaybackNote");
 			}
 		}
 
@@ -225,6 +226,7 @@ window.onload = function () {
 			if (validnote['notename'] == true && validnote['accidental'] == true) {
 				startingNote = this.value;
 				recalculate();
+				if (localStorageAvailable) { localStorage.setItem(storagePrefix+"startingNote", startingNote); }
 			}
 
 			else {
@@ -255,6 +257,7 @@ window.onload = function () {
 			if (!isNaN(this.value) && this.value > 20 && this.value < 20000 ) {
 				startingFreq = this.value;
 				recalculate();
+				if (localStorageAvailable) {localStorage.setItem(storagePrefix+"startingFreq", startingFreq);}
 			}
 			else {
 				//print error
@@ -632,6 +635,7 @@ window.onload = function () {
 		updateDisplay();
 		updatePlaybackNote();
 	}
+	
 	function getInterval(tuneTo, tuneFrom) {
 		var semitones = getNoteNumber(tuneTo) - getNoteNumber(tuneFrom);
 		if (semitones < 0) semitones += 12;
@@ -681,6 +685,8 @@ window.onload = function () {
 		if (oscillator) {
 			oscillator.frequency.value=getCurrentFrequency();
 		}
+
+		if (localStorageAvailable) {localStorage.setItem(storagePrefix+"startingPlaybackNote", currentPlaybackNote); }
 	}
 
 	function getNoteNumber(noteName) {

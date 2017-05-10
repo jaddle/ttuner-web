@@ -4,6 +4,14 @@
 **saving temperaments and settings to localstorage
 https://www.w3schools.com/html/html5_webstorage.asp
 
+what settings to save, and when?
+save current temperament - all the rules explicitly, so it can be a temperament 'in progress', not saved yet. Resave after each recalculate? That's a bit redundant.. might be simplest, but more efficient to just do it when a rule changes.
+save current note and volume on each change.
+startingNote and frequency on each change
+saved temperaments - add when saving.
+
+
+
 **importing/exporting to/from text boxes
 (global for switching to another computer, and just a temperament for sending one to someone)
 
@@ -41,7 +49,7 @@ all the checking can be done upon entry.
 
 popup a special 'keyboard' for each field, with suggestions along the top, and buttons below.
 
-so for a note, it has notes A-G, and #, b, bb, x. Along the top, suggest a the most likely - in a note1, suggest the last note2, note2, suggest a fifth and major third, up and down. for startingnote, just suggest A and C, since no one uses much else very often. Frequency, recently used frequencies, and 415, 415.3, 440, 466, 392. Fractions, suggest last used, then -1/4, -1/5, -1/6, -1/12. Keyboard needs -, numbers, period, and slash.
+so for a note, it has notes A-G, and #, b, bb, x. Along the top, suggest a the most likely - in a note1, suggest the last note2, note2, suggest a fifth and major third, up and down. for startingnote, just suggest A and C, since no one uses much else very often. Frequency, recently used frequencies, and 415, 415.3, 430, 440, 466, 392. Fractions, suggest last used, then -1/4, -1/5, -1/6, -1/12. Keyboard needs -, numbers, period, and slash.
 
 Then only allow input with the special keyboard, but also watch for keypresses (only the ones in the box).
 
