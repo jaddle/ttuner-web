@@ -1,19 +1,6 @@
 
 ==========next steps=======
 
-**make drop-down suggestions
-notes: 
-list of notes. For note1, make the first choice the previous note2
-Once you've typed a notename, suggest its accidentals
-
-fraction:
-suggest first the last used fraction
-then a list of -1/4, -1/5, -1/6, -1/12
-no need to put in anything special for thirds, since they are almost never tuned except pure.
-
-
-
-
 **saving temperaments and settings to localstorage
 https://www.w3schools.com/html/html5_webstorage.asp
 
@@ -24,6 +11,8 @@ https://www.w3schools.com/html/html5_webstorage.asp
 (disable when local file:// url)
 
 **"help/about" page with version info, home page link, author, etc
+
+**spiff up interface, esp for phones, with specialized keyboardpopups**
 
 **make it look nice with some more css
 
@@ -44,15 +33,29 @@ change rules list into a table, just to make formatting easier, and to have tabl
 **add more visualizations - graph via canvas (or make svgs???)
 
 
+=========interface==========
+
+simplify - make an interface that will be easy for keyboards and phones, and have less to worry about.
+
+all the checking can be done upon entry.
+
+popup a special 'keyboard' for each field, with suggestions along the top, and buttons below.
+
+so for a note, it has notes A-G, and #, b, bb, x. Along the top, suggest a the most likely - in a note1, suggest the last note2, note2, suggest a fifth and major third, up and down. for startingnote, just suggest A and C, since no one uses much else very often. Frequency, recently used frequencies, and 415, 415.3, 440, 466, 392. Fractions, suggest last used, then -1/4, -1/5, -1/6, -1/12. Keyboard needs -, numbers, period, and slash.
+
+Then only allow input with the special keyboard, but also watch for keypresses (only the ones in the box).
+
+
+
+
+always have a blank rule - so get rid of the 'new rule' button. Calculate as soon as there are two notes available, and then any time something changes...?
+maybe not... 
+make a way to 'tab' to the next field, on a phone. Each 'keyboard' needs a 'next' button, which jumps forwards.
+
+
 ===========temperament list=============
 
 Maybe at some point, it'd be nice to sort them different ways - name, degree of inequality, category/type? (circulating, near-equal, meantone, mod-meantone, etc)
-
-===========organization================
-variables - one big one for tuning rules, and another for calculated note info (to start, just save the frequencies)
-
-maybe a few other variables that get saved/restored from local storage for configuration - waveform, octave break location. Either a config popup page lists them, or else just boxes where appropriate (next to table for octave break, near playback for waveform...)
-
 
 ==========table============
 a button for "switch 0 point of cents deviation", then just click on a note in the table.
@@ -63,18 +66,12 @@ interval stuff needs to figure out *which* interval, in the case of enharmonic s
 
 need to implement cents input somehow.
 
-temperament name
-description
-
-======starting note/frequency========
-give a list of typical frequencies for that note, + last 4-5 most recent
-
 ==============playback==============
 also, should the table display the frequencies for the current octave, or just starting from the startingFreq? Maybe a 2nd column for "currnet playback pitch" or something, if that's useful?
 also highlight the current note in the table
 keyboard shortcut for next/prev note and octave
 
-option for waveform
+option for waveform - sine, triangle, custom (?)
 
 chord mode (lets you select the notes (and modify each one's octave) - in the table list, or elsewhere? Step up/down chords would be nice!
 
@@ -87,7 +84,7 @@ export current temperaments, or all local temperaments (show the json export inf
 
 
 ===========checkRule=================
-needs to check for duplicates and valid intervals (p5/M3 and inversions for now)
+needs to check for duplicates and conflicts. How? maybe calculate every rule, even if we have both its notes, and then mark it as used. If we have the note already, just verify that it's the same frequency (or close enough). If not, toss out an error, highlighting all the rules with that note.
 
 ============compatibility==============
-input type="range" only supported as of v10 in IE...
+input type="range" only supported as of v10 in IE... used for volume. Make a custom slider instead?
