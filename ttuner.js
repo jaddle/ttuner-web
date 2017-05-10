@@ -212,18 +212,58 @@ window.onload = function () {
 		}
 		
 		document.getElementById("startingNote").onchange = function() {
-			//FIXME validate that it's a real note name! Reuse code from checkrule.
 			//if it's not good, print an error message and leave without changing anything.
 			//clear old error message here
-			startingNote = this.value;
-			recalculate();
+			this.className="";
+			var errormessage = document.getElementById("startingNoteFreq").getElementsByClassName("notenameError")[0];
+			if (errormessage) {
+				document.getElementById("startingNoteFreq").removeChild(errormessage);
+			}
+
+			var validnote=checkNote(this.value);
+			this.value = validnote['tidynote'];
+			if (validnote['notename'] == true && validnote['accidental'] == true) {
+				startingNote = this.value;
+				recalculate();
+			}
+
+			else {
+				//print error
+				this.className = "error";
+				errormessage = document.createElement("span");
+				errormessage.className = "errormessage notenameError";
+				if (validnote['notename'] == false) {
+					errormessage.innerHTML += "Invalid notename.";
+				}
+				if (validnote['accidental'] == false) {
+					errormessage.innerHTML += "Invalid accidental.";
+				}
+				document.getElementById("startingNoteFreq").appendChild(errormessage);
+
+			}
 		}
 		document.getElementById("startingFreq").onchange = function() {
-			//FIXME validate that it's a valid frequency. Must be a number, between a certain range...? 20-20000?
+			//validate that it's a valid frequency. Must be a number, between a certain range...? 20-20000?
 			//if it's not good, print an error message and leave without changing anything.
 			//clear old error message here
-			startingFreq = this.value;
-			recalculate();
+			this.className="";
+			var errormessage = document.getElementById("startingNoteFreq").getElementsByClassName("frequencyError")[0];
+			if (errormessage) {
+				document.getElementById("startingNoteFreq").removeChild(errormessage);
+			}
+
+			if (!isNaN(this.value) && this.value > 20 && this.value < 20000 ) {
+				startingFreq = this.value;
+				recalculate();
+			}
+			else {
+				//print error
+				this.className = "error";
+				errormessage = document.createElement("span");
+				errormessage.className = "errormessage frequencyError";
+				errormessage.innerHTML += "Invalid frequency. Acceptable values: 20-20000Hz.";
+				document.getElementById("startingNoteFreq").appendChild(errormessage);
+			}
 		}
 	}
 
@@ -783,6 +823,62 @@ window.onload = function () {
 		if (select[0]) select[0].disabled=true;
 	}
 
+	function checkNote(note) {
+		//takes a note string, and checks if it's a real note name.
+		//returns {notename:true,accidental: true} if it's good. Also has newnotename to make it pretty.
+		var accidental;
+		var notename = note[0];
+		var valid = {"notename": true, "accidental": true, };
+		if (!notename) notename = "";
+		if (note.length > 1) { accidental = note.slice(1); }
+		else { accidental = ''; }
+
+		notename = notename.toUpperCase();
+
+		if (notename.search(/[A-G]/) == -1) {
+			valid['notename'] = false;
+		}
+
+		switch (accidental) {
+			case '':
+				break;
+
+			case '#':
+			case '♯':
+			case '+':
+				accidental = '♯';
+				break;
+
+			case 'b':
+			case '-':
+			case '♭':
+				accidental = '♭';
+				break;
+
+			case '##':
+			case '++':
+			case '♯♯':
+			case 'x':
+			case '×':
+				accidental = 'x';
+				break;
+
+			case 'bb':
+			case '♭♭':
+			case '--':
+				accidental = '♭♭';
+				break;
+
+			default:
+				valid['accidental'] = false;
+				break;
+		}
+
+		valid['tidynote'] = notename+accidental;
+		return valid;
+
+	}
+
 	function checkRule(rule) {
 		//check the three rule parts. Return a sanitized version of the rule with an extra field 'valid':
 		//valid contains info about the things that didn't work. If it doesn't have anything, all is well!
@@ -798,58 +894,17 @@ window.onload = function () {
 		rule['comma'] = rule['comma'].replace(/\s/g, '');
 
 		var errors;
+		var validnote;
 
 		//check notenames and accidentals, making uppercase
 		for (i=1; i<3; i++) {
 			errors = [];
-			notename = rule['note'+i][0];
-			if (!notename) notename="";
-			if (rule['note'+i].length > 1) { accidental = rule['note'+i].slice(1); }
-			else { accidental = ''; }
-
-			notename = notename.toUpperCase();
-
-			if (notename.search(/[A-G]/) == -1) {
-				errors.push("Invalid note name");
-			}
-
-			switch (accidental) {
-				case '':
-					break;
-
-				case '#':
-				case '♯':
-				case '+':
-					accidental = '♯';
-					break;
-
-				case 'b':
-				case '-':
-				case '♭':
-					accidental = '♭';
-					break;
-
-				case '##':
-				case '++':
-				case '♯♯':
-				case 'x':
-				case '×':
-					accidental = 'x';
-					break;
-
-				case 'bb':
-				case '♭♭':
-				case '--':
-					accidental = '♭♭';
-					break;
-
-				default:
-					errors.push("Invalid accidental");
-					break;
-			}
+			validnote = checkNote(rule['note'+i]);
+			if (validnote['notename'] == false) { errors.push("Invalid note name"); }
+			if (validnote['accidental'] == false) { errors.push("Invalid accidental"); }
 
 			if (errors.length >0) { rule['valid']['note'+i] = errors; rule['valid']['errors']++; }
-			else rule['note'+i] = notename+accidental;
+			else rule['note'+i] = validnote['tidynote'];
 
 		}
 		
