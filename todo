@@ -1,14 +1,11 @@
 
 ==========next steps=======
 
-**saving temperaments and settings to localstorage
-https://www.w3schools.com/html/html5_webstorage.asp
+bug - disable 'load' button when no temperament selected
 
-what settings to save, and when?
-save current temperament - all the rules explicitly, so it can be a temperament 'in progress', not saved yet. Resave after each recalculate? That's a bit redundant.. might be simplest, but more efficient to just do it when a rule changes.
-save current note and volume on each change.
-startingNote and frequency on each change
-saved temperaments - add when saving.
+**saving temperaments and settings to localstorage
+
+need to save volume
 
 
 

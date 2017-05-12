@@ -6,11 +6,16 @@ window.onload = function () {
 	var startingFreq=415.3;
 	var currentPlaybackNote="A";
 	var octave="-1"; // switch octaves at C always? see how console version worked (for batch mode)
+
+
+
+	//variables accessible to other functions
 	var audioContext = new (window.AudioContext || window.webkitAudioContext)();
 	var gain = audioContext.createGain();
 	var oscillator;
+	var loading=false; //to block unnecessary recalculations
 	
-	//variables accessible to other functions
+
 	var ruleList = [];
 	var notes = {};
 	var sortedNotes=[]; //array of notes, in order of frequency - update it whenever notes changes!
@@ -28,8 +33,8 @@ window.onload = function () {
 	
 	refreshTemperamentList();
 	loadLocalSettings();
-	loadCurrentTemperament();
 	addListeners();
+	loadCurrentTemperament();
 	
 	
 	//===========functions===============
@@ -71,23 +76,24 @@ window.onload = function () {
 			//load local settings, setting defaults for anything missing.
 
 
-			if (localStorage.getItem(storagePrefix+"startingNote")) {
+			if (restoreFromStorage("startingNote")) {
 				//FIXME validate
-				startingNote=localStorage.getItem(storagePrefix+"startingNote");
+				startingNote=restoreFromStorage("startingNote");
 			} 
 			
-			if (localStorage.getItem(storagePrefix+"startingFreq")) {
+			if (restoreFromStorage("startingFreq")) {
 				//FIXME validate
-				startingFreq=localStorage.getItem(storagePrefix+"startingFreq");
-			}
+				startingFreq=restoreFromStorage("startingFreq");
+			} 
 
 			//TODO current temperament
 			//(name, description, rules)
-			
-			if (localStorage.getItem(storagePrefix+"startingPlaybackNote")) {
+
+			if (restoreFromStorage("currentPlaybackNote")) {
 				//FIXME validate
-				startingPlaybackNote=localStorage.getItem(storagePrefix+"startingPlaybackNote");
-			}
+				currentPlaybackNote=restoreFromStorage("currentPlaybackNote");
+			} 
+
 		}
 
 		//populate html with settings
@@ -226,7 +232,7 @@ window.onload = function () {
 			if (validnote['notename'] == true && validnote['accidental'] == true) {
 				startingNote = this.value;
 				recalculate();
-				if (localStorageAvailable) { localStorage.setItem(storagePrefix+"startingNote", startingNote); }
+				saveToStorage("startingNote", startingNote);
 			}
 
 			else {
@@ -257,7 +263,7 @@ window.onload = function () {
 			if (!isNaN(this.value) && this.value > 20 && this.value < 20000 ) {
 				startingFreq = this.value;
 				recalculate();
-				if (localStorageAvailable) {localStorage.setItem(storagePrefix+"startingFreq", startingFreq);}
+				saveToStorage("startingFreq", startingFreq);
 			}
 			else {
 				//print error
@@ -322,6 +328,8 @@ window.onload = function () {
 	}
 		
 	function loadTemperament(temperament) {
+		loading = true;
+
 		//takes a temperament object (name, description, rules[]) and loads it into the rule list, and updates the html and recalculates
 		var i;
 		
@@ -353,16 +361,30 @@ window.onload = function () {
 			
 			newRule.getElementsByClassName("okButton")[0].click();
 		}
+		loading=false;
 
 		recalculate();
 	}
+
+	function saveCurrentTemperament() {
+		var currentTemperament = {};
+		currentTemperament.name = document.getElementById("temperamentName").value;
+		currentTemperament.description = document.getElementById("temperamentDescription").innerHTML;
+		currentTemperament.rules = ruleList;
+
+		saveToStorage("currentTemperament", currentTemperament);
+	}
 		
 
-	function loadCurrentTemperament() {
+	function loadCurrentTemperament() {	
 		//load current temperament (if there is one)
 
-		//calculate note values
-		recalculate();
+		if (restoreFromStorage("currentTemperament")) {
+			//FIXME validate
+			var newTemperament=restoreFromStorage("currentTemperament");
+			loadTemperament(newTemperament);
+		} 
+
 	}
 
 	function editRule(ruleLi) {
@@ -386,6 +408,7 @@ window.onload = function () {
 				delete ruleList[currentID];
 			}
 			this.parentElement.remove();
+
 			recalculate();
 		}
 		ruleLi.appendChild(deletebutton);
@@ -462,6 +485,7 @@ window.onload = function () {
 				if (newId != currentID) {
 					ruleLi.setAttribute("data-ruleid", newId);
 				}			
+				saveCurrentTemperament();
 
 				//and reset all the buttons back to normal - remove the cancel and delete, and turn this Ok back into an Edit.
 				var buttonsToDelete=Array.prototype.slice.call(ruleLi.getElementsByTagName("input"));
@@ -480,7 +504,8 @@ window.onload = function () {
 				}
 				ruleLi.appendChild(editButton);
 
-				recalculate();
+				//this shouldn't be called when loading a temperament, since then it fires every single rule!
+				if (!loading) { recalculate(); }
 
 			}
 			//TODO if it's not good, highlight it in red, with an error message
@@ -556,7 +581,6 @@ window.onload = function () {
 			noteFound=false;
 			for (i=0; i<ruleList.length; i++) {
 				if (ruleList[i] == undefined) { continue; }
-				console.log(ruleList[i]);
 				
 				//if we have one of the two notes in the relationship, calculate the other!
 
@@ -686,7 +710,7 @@ window.onload = function () {
 			oscillator.frequency.value=getCurrentFrequency();
 		}
 
-		if (localStorageAvailable) {localStorage.setItem(storagePrefix+"startingPlaybackNote", currentPlaybackNote); }
+		saveToStorage("currentPlaybackNote", currentPlaybackNote);
 	}
 
 	function getNoteNumber(noteName) {
@@ -806,6 +830,20 @@ window.onload = function () {
 			return ruleList.length-1;
 		}
 
+
+	}
+
+	function saveToStorage(varName, variable) {
+		if (localStorageAvailable) { 
+			localStorage.setItem(storagePrefix+varName, JSON.stringify(variable)); 
+		}
+	}
+
+	function restoreFromStorage(varName) {
+		if (localStorageAvailable) {
+			return JSON.parse(localStorage.getItem(storagePrefix+varName));
+		}
+		else return null;
 	}
 
 	function enableInputs(element) {
