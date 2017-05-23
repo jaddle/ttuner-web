@@ -117,6 +117,7 @@ window.onload = function () {
 		var temperamentList = document.getElementById("availabletemperaments");
 
 		temperamentList.onclick = function() {
+			document.getElementById("loadtemperament").disabled=false;
 			//get the selected temperament
 			var selectedTemperament = this.options[this.selectedIndex].value;
 			var descriptionParagraph = document.getElementById("temperamentdescription");
@@ -147,6 +148,8 @@ window.onload = function () {
 				}
 			}
 		}
+
+		temperamentButton.disabled = true;
 
 		//new temperament
 
