@@ -350,7 +350,9 @@ window.onload = function () {
 
 		newRuleButton = document.getElementById("newRule");
 
+
 		for (i=0; i<temperament.rules.length; i++) {
+			if (temperament.rules[i] == null) { continue; }
 			newRuleButton.click();
 			newRule = rules[rules.length-1];
 			newRule.getElementsByClassName("note1")[0].value=temperament.rules[i].note1;
@@ -367,10 +369,20 @@ window.onload = function () {
 	}
 
 	function saveCurrentTemperament() {
+		var i;
 		var currentTemperament = {};
 		currentTemperament.name = document.getElementById("temperamentName").value;
 		currentTemperament.description = document.getElementById("temperamentDescription").innerHTML;
-		currentTemperament.rules = ruleList;
+		currentTemperament.rules=[];
+		for (i=0; i<ruleList.length; i++) {
+			if (ruleList[i] == null) continue;
+			currentTemperament.rules.push({
+				"note1": ruleList[i].note1, 
+				"note2": ruleList[i].note2, 
+				"fraction": ruleList[i].fraction, 
+				"comma": ruleList[i].comma
+			});
+		}
 
 		saveToStorage("currentTemperament", currentTemperament);
 	}
@@ -480,12 +492,14 @@ window.onload = function () {
 
 				disableInputs(ruleLi);
 
+				//remove the error info from the rule
+				delete rule.valid;
+
 				//add to rule list and recalculate notes
 				var newId=addRule(rule);
 				if (newId != currentID) {
 					ruleLi.setAttribute("data-ruleid", newId);
 				}			
-				saveCurrentTemperament();
 
 				//and reset all the buttons back to normal - remove the cancel and delete, and turn this Ok back into an Edit.
 				var buttonsToDelete=Array.prototype.slice.call(ruleLi.getElementsByTagName("input"));
@@ -658,6 +672,7 @@ window.onload = function () {
 		sortNotes();
 		updateDisplay();
 		updatePlaybackNote();
+		saveCurrentTemperament();
 	}
 	
 	function getInterval(tuneTo, tuneFrom) {
