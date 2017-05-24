@@ -1,17 +1,16 @@
 
 ==========next steps=======
 
+**save temperament name/description when they are edited
 
-**saving temperaments and settings to localstorage
-
-need to save volume
-
-
+**save local temperaments to list
 
 **importing/exporting to/from text boxes
 (global for switching to another computer, and just a temperament for sending one to someone)
 
-**link button - send a link to your current page - same settings, same temperament (but not all your saved temperaments). Just needs current frequency/startingnote and all the temperament rules.
+**link button - send a link to your current page - same settings, same
+temperament (but not all your saved temperaments). Just needs current
+frequency/startingnote and all the temperament rules.  
 (disable when local file:// url)
 
 **"help/about" page with version info, home page link, author, etc

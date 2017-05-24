@@ -6,6 +6,7 @@ window.onload = function () {
 	var startingFreq=415.3;
 	var currentPlaybackNote="A";
 	var octave="-1"; // switch octaves at C always? see how console version worked (for batch mode)
+	var startingVolume=.5;
 
 
 
@@ -75,6 +76,11 @@ window.onload = function () {
 
 			//load local settings, setting defaults for anything missing.
 
+			if (restoreFromStorage("currentVolume")) {
+				//FIXME validate
+				startingVolume = restoreFromStorage("currentVolume");
+			}
+				
 
 			if (restoreFromStorage("startingNote")) {
 				//FIXME validate
@@ -99,6 +105,7 @@ window.onload = function () {
 		//populate html with settings
 		document.getElementById("startingNote").value=startingNote;
 		document.getElementById("startingFreq").value=startingFreq;
+		document.getElementById("volumeslider").value=startingVolume;
 	}
 
 	function addListeners() {
@@ -219,6 +226,7 @@ window.onload = function () {
 
 		document.getElementById("volumeslider").oninput = function() {
 			if (oscillator) gain.gain.value = this.value;
+			saveToStorage("currentVolume", this.value);
 		}
 		
 		document.getElementById("startingNote").onchange = function() {
@@ -276,6 +284,22 @@ window.onload = function () {
 				errormessage.innerHTML += "Invalid frequency. Acceptable values: 20-20000Hz.";
 				document.getElementById("startingNoteFreq").appendChild(errormessage);
 			}
+		}
+
+		document.getElementById("resetbutton").onclick = function() {
+			var i;
+			var keysToDelete=[];
+			var key;
+			for (i=0; i<localStorage.length; i++) {
+				key = localStorage.key(i);
+				if (key.startsWith(storagePrefix)) { keysToDelete.push(key); }
+			}
+			for (i=0; i<keysToDelete.length; i++) {
+				console.log(keysToDelete[i]);
+				localStorage.removeItem(keysToDelete[i]);
+
+			}
+			location.reload(true);
 		}
 	}
 
