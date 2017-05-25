@@ -261,6 +261,14 @@ window.onload = function () {
 
 			}
 		}
+
+		document.getElementById("temperamentName").onchange = function() {
+			saveCurrentTemperament();
+		}
+		document.getElementById("temperamentDescription").onchange = function() {
+			saveCurrentTemperament();
+		}
+
 		document.getElementById("startingFreq").onchange = function() {
 			//validate that it's a valid frequency. Must be a number, between a certain range...? 20-20000?
 			//if it's not good, print an error message and leave without changing anything.
@@ -295,7 +303,6 @@ window.onload = function () {
 				if (key.startsWith(storagePrefix)) { keysToDelete.push(key); }
 			}
 			for (i=0; i<keysToDelete.length; i++) {
-				console.log(keysToDelete[i]);
 				localStorage.removeItem(keysToDelete[i]);
 
 			}
@@ -399,7 +406,7 @@ window.onload = function () {
 		var i;
 		var currentTemperament = {};
 		currentTemperament.name = document.getElementById("temperamentName").value;
-		currentTemperament.description = document.getElementById("temperamentDescription").innerHTML;
+		currentTemperament.description = document.getElementById("temperamentDescription").value;
 		currentTemperament.rules=[];
 		for (i=0; i<ruleList.length; i++) {
 			if (ruleList[i] == null) continue;
