@@ -462,7 +462,8 @@ window.onload = function () {
 		}
 		ruleLi.appendChild(deletebutton);
 
-		if (currentID) {
+		console.log("current id: " + currentID);
+		if (currentID != undefined) {
 			var cancelbutton = document.createElement("input");
 			cancelbutton.type="submit";
 			cancelbutton.value="Cancel";
@@ -533,7 +534,9 @@ window.onload = function () {
 				delete rule.valid;
 
 				//add to rule list and recalculate notes
+				console.log(rule);
 				var newId=addRule(rule);
+				console.log("new id: " + newId);
 				if (newId != currentID) {
 					ruleLi.setAttribute("data-ruleid", newId);
 				}			
@@ -867,13 +870,12 @@ window.onload = function () {
 
 	function addRule(rule) {
 		//adds the data to the rules list and returns the id of the rule
+		console.log (ruleList);
 
-		if (rule['id']) {
+		if (rule['ID'] != undefined) {
 			//replace the existing rule
-			ruleList[rule['id']]=rule;
-			//don't want extra id values floating around in there where they shouldn't be!
-			delete ruleList[rule['id']]['id'];
-			return rule['id'];
+			ruleList[rule['ID']]=rule;
+			return rule['ID'];
 		}
 		else {
 			//if id is 0, it's a new id
