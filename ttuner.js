@@ -431,6 +431,9 @@ window.onload = function () {
 			loadTemperament(newTemperament);
 		} 
 
+		//this is just to get the notes object populated with the starting pitch/frequency
+		else { recalculate(); }
+
 	}
 
 	function editRule(ruleLi) {

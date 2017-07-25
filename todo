@@ -1,6 +1,11 @@
 
 ==========next steps=======
 
+tidy up the code a bunch - more clear functions for translating the forms of rules back and forth (html, json, javascript...)
+
+
+
+
 **save local temperaments to list
 
 **importing/exporting to/from text boxes
